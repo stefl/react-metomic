@@ -22,6 +22,9 @@ const MetomicProvider = ({
   autoblocking = true,
   debug = false,
   children,
+  onError = e => {
+    throw e;
+  },
 }) => {
   const [embedReady, setEmbedReady] = useState(false);
   const [mtmContext, setMtmContext] = useState(undefined);
@@ -54,7 +57,12 @@ const MetomicProvider = ({
 
   useEffect(() => {
     if (isReady) {
-      window.Metomic('load', {projectId});
+      try {
+        window.Metomic('load', {projectId});
+      } catch (e) {
+        setIsReady(false);
+        onError(e);
+      }
     }
   }, [autoblocking, isReady, projectId]);
 
